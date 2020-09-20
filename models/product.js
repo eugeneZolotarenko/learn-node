@@ -3,7 +3,7 @@ const path = require("path")
 
 const rootDir = require("../utils/path")
 
-const pathOfFile = path.join(rootDir, "data", "products")
+const pathOfFile = path.join(rootDir, "data", "products.json")
 
 function getProductsFromFile(cb) {
   fs.readFile(pathOfFile, (err, fileContent) => {
@@ -15,14 +15,15 @@ function getProductsFromFile(cb) {
 }
 
 module.exports = class Product {
-  constructor(title, imageUrl, description, price) {
+  constructor(title, imageUrl, price, description) {
     this.title = title
     this.imageUrl = imageUrl
-    this.description = description
     this.price = price
+    this.description = description
   }
 
   save() {
+    this.id = Math.random().toString()
     getProductsFromFile((products) => {
       products.push(this)
       fs.writeFile(pathOfFile, JSON.stringify(products), (err) => {
@@ -33,5 +34,12 @@ module.exports = class Product {
 
   static fetchAll(cb) {
     getProductsFromFile(cb)
+  }
+
+  static fetchOneById(id, cb) {
+    getProductsFromFile((products) => {
+      const product = products.find((p) => p.id === id)
+      cb(product)
+    })
   }
 }
