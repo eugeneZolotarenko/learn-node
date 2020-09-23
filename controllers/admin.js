@@ -36,9 +36,14 @@ exports.getEditProduct = (req, res) => {
 
 exports.postEditProduct = (req, res) => {
   const { title, imageUrl, price, description, id } = req.body
-  console.log(id)
   const product = new Product(id, title, imageUrl, price, description)
   product.save()
+  res.redirect("/")
+}
+
+exports.postDeleteProduct = (req, res) => {
+  const { id } = req.body
+  Product.delete(id)
   res.redirect("/")
 }
 

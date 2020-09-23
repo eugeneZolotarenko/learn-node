@@ -31,7 +31,6 @@ module.exports = class Product {
         )
         const updatedProducts = [...products]
         updatedProducts[existingProductIndex] = this
-        console.log(updatedProducts[existingProductIndex])
         fs.writeFile(pathOfFile, JSON.stringify(updatedProducts), (err) => {
           console.error(err)
         })
@@ -42,6 +41,15 @@ module.exports = class Product {
           console.error(err)
         })
       }
+    })
+  }
+
+  static delete(id) {
+    getProductsFromFile((products) => {
+      const updatedProducts = products.filter((prod) => prod.id !== id)
+      fs.writeFile(pathOfFile, JSON.stringify(updatedProducts), (err) => {
+        console.error(err)
+      })
     })
   }
 
