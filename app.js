@@ -6,7 +6,7 @@ const express = require("express")
 const bodyParser = require("body-parser")
 
 const rootDir = require("./utils/path")
-// const db = require("./utils/database")
+const sequelize = require("./utils/database")
 
 const errorsController = require("./controllers/errors")
 
@@ -26,4 +26,9 @@ app.use(shopRoutes)
 
 app.use(errorsController.renderPageNotFound)
 
-app.listen(3000)
+sequelize
+  .sync()
+  .then((result) => {
+    app.listen(3000)
+  })
+  .catch((err) => console.log(err))
