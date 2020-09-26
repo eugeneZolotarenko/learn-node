@@ -4,6 +4,7 @@ const path = require("path")
 const rootDir = require("../utils/path")
 
 const pathOfFile = path.join(rootDir, "data", "products.json")
+const Cart = require("./cart")
 
 function getProductsFromFile(cb) {
   fs.readFile(pathOfFile, (err, fileContent) => {
@@ -46,9 +47,13 @@ module.exports = class Product {
 
   static delete(id) {
     getProductsFromFile((products) => {
+      const product = products.find((prod) => prod.id === id)
       const updatedProducts = products.filter((prod) => prod.id !== id)
       fs.writeFile(pathOfFile, JSON.stringify(updatedProducts), (err) => {
         console.error(err)
+        if (!err) {
+          Cart.deleteProduct(id, product)
+        }
       })
     })
   }
