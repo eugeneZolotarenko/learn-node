@@ -11,8 +11,10 @@ exports.renderAddProductPage = (req, res) => {
 exports.postNewProduct = (req, res) => {
   const { title, imageUrl, price, description } = req.body
   const product = new Product(null, title, imageUrl, price, description)
-  product.save()
-  res.redirect("/")
+  product
+    .save()
+    .then(() => res.redirect("/"))
+    .catch((err) => console.error(err))
 }
 
 exports.getEditProduct = (req, res) => {
