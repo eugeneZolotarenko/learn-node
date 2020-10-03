@@ -10,19 +10,28 @@ exports.renderAddProductPage = (req, res) => {
 
 exports.postNewProduct = (req, res) => {
   const { title, imageUrl, price, description } = req.body
-  Product.create({ title, price, imageUrl, price, description })
+  req.user
+    .createProduct({
+      title,
+      price,
+      imageUrl,
+      price,
+      description,
+    })
     .then(() => res.redirect("/admin/products"))
-    .catch((res) => console.error(res))
+    .catch((err) => console.error(err))
 }
 
 exports.getEditProduct = (req, res) => {
   const editMode = req.query.edit
-  const { productId } = req.params
   if (!editMode) {
     return res.redirect("/")
   }
-  Product.findByPk(productId)
-    .then((product) => {
+  const { productId } = req.params
+  req.user
+    .getProducts({ where: { id: productId } })
+    .then((products) => {
+      const product = products[0]
       if (!product) {
         return res.redirect("/")
       }
@@ -59,7 +68,8 @@ exports.postDeleteProduct = (req, res) => {
 }
 
 exports.getProducts = (req, res) => {
-  Product.findAll()
+  req.user
+    .getProducts()
     .then((products) => {
       res.render("admin/products", {
         products,
