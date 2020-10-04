@@ -8,10 +8,10 @@ const bodyParser = require("body-parser")
 const rootDir = require("./utils/path")
 
 const errorsController = require("./controllers/errors")
-const mongoConnect = require("./utils/database")
+const mongoConnect = require("./utils/database").mongoConnect
 
 const adminRoutes = require("./routes/admin")
-// const shopRoutes = require("./routes/shop")
+const shopRoutes = require("./routes/shop")
 
 const app = express()
 
@@ -28,14 +28,14 @@ app.use((req, res, next) => {
   //     next()
   //   })
   //   .catch((err) => console.log(err))
+  next()
 })
 
 app.use("/admin", adminRoutes)
-// app.use(shopRoutes)
+app.use(shopRoutes)
 
 app.use(errorsController.renderPageNotFound)
 
 mongoConnect((client) => {
-  console.log(client)
   app.listen(3000)
 })
