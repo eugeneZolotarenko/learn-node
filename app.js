@@ -6,15 +6,10 @@ const express = require("express")
 const bodyParser = require("body-parser")
 
 const rootDir = require("./utils/path")
-const sequelize = require("./utils/database")
-const Product = require("./models/product")
-const User = require("./models/user")
-const Cart = require("./models/cart")
-const CartItem = require("./models/cart-item")
-const Order = require("./models/order")
-const OrderItem = require("./models/order-item")
 
 const errorsController = require("./controllers/errors")
+const mongoConnect = require("./utils/database").mongoConnect
+const User = require("./models/user")
 
 const adminRoutes = require("./routes/admin")
 const shopRoutes = require("./routes/shop")
@@ -27,13 +22,14 @@ app.set("views", "views")
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(rootDir, "public")))
 
-app.use((req, res, next) => {
-  User.findByPk(1)
-    .then((user) => {
-      req.user = user
-      next()
-    })
-    .catch((err) => console.log(err))
+app.use(async (req, res, next) => {
+  try {
+    req.user = await User.findById("5f7b63c3fb27cf33efa7994d")
+    next()
+  } catch (error) {
+    console.log(error)
+  }
+  next()
 })
 
 app.use("/admin", adminRoutes)
@@ -41,32 +37,6 @@ app.use(shopRoutes)
 
 app.use(errorsController.renderPageNotFound)
 
-Product.belongsTo(User, { constrains: true, onDelete: "CASCADE" })
-User.hasMany(Product)
-User.hasOne(Cart)
-Cart.belongsTo(User)
-Cart.belongsToMany(Product, { through: CartItem })
-Product.belongsToMany(Cart, { through: CartItem })
-Order.belongsTo(User)
-User.hasMany(Order)
-Order.belongsToMany(Product, { through: OrderItem })
-
-sequelize
-  // .sync({ force: true })
-  .sync()
-  .then(() => {
-    return User.findByPk(1)
-  })
-  .then((user) => {
-    if (!user) {
-      return User.create({ name: "Eugene", email: "test@test.com" })
-    }
-    return user
-  })
-  .then((user) => {
-    return user.createCart()
-  })
-  .then(() => {
-    app.listen(3000)
-  })
-  .catch((err) => console.log(err))
+mongoConnect((client) => {
+  app.listen(3000)
+})
