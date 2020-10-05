@@ -43,35 +43,22 @@ exports.getEditProduct = async (req, res) => {
 exports.postEditProduct = async (req, res) => {
   const { title, imageUrl, price, description, id } = req.body
   try {
-    await new Product(
-      title,
-      price,
-      imageUrl,
-      description,
-      new mongodb.ObjectId(id)
-    ).save()
+    await new Product(title, price, imageUrl, description, id).save()
     await res.redirect("/admin/products")
   } catch (error) {
     console.log(error)
   }
-  // .then((product) => {
-  //   product.title = title
-  //   product.price = price
-  //   product.description = description
-  //   product.imageUrl = imageUrl
-  //   return product.save()
-  // })
-  // .then(() => res.redirect("/admin/products"))
-  // .catch((err) => console.log(err))
 }
 
-// exports.postDeleteProduct = (req, res) => {
-//   const { id } = req.body
-//   Product.findByPk(id)
-//     .then((product) => product.destroy())
-//     .then(() => res.redirect("/admin/products"))
-//     .catch((err) => console.log(err))
-// }
+exports.postDeleteProduct = async (req, res) => {
+  try {
+    const { id } = req.body
+    await Product.deleteById(id)
+    await res.redirect("/admin/products")
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 exports.getProducts = async (req, res) => {
   try {
