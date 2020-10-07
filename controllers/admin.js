@@ -12,7 +12,7 @@ exports.renderAddProductPage = (req, res) => {
 
 exports.postNewProduct = (req, res) => {
   const { title, price, imageUrl, description } = req.body
-  new Product(title, price, imageUrl, description)
+  new Product(title, price, imageUrl, description, null, req.user._id)
     .save()
     .then(() => res.redirect("/admin/products"))
     .catch((err) => console.error(err))
