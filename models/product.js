@@ -3,12 +3,13 @@ const getDb = require("../utils/database").getDb
 const mongodb = require("mongodb")
 
 class Product {
-  constructor(title, price, imageUrl, description, id) {
+  constructor(title, price, imageUrl, description, id, userId) {
     this.title = title
     this.price = price
     this.imageUrl = imageUrl
     this.description = description
     this._id = id && new mongodb.ObjectId(id)
+    this.userId = userId
   }
 
   async save() {
@@ -51,9 +52,17 @@ class Product {
     console.log(id)
     try {
       const db = await getDb()
-      return await db
+      await db
         .collection("products")
         .deleteOne({ _id: new mongodb.ObjectId(id) })
+      return await db.collection("users").updateOne(
+        { _id: new mongodb.ObjectId(userId) },
+        {
+          $pull: {
+            "cart.items": { productId: new ObjectId(prodId) },
+          },
+        }
+      )
     } catch (error) {
       console.log(error)
     }

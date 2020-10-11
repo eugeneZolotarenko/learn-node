@@ -24,12 +24,12 @@ app.use(express.static(path.join(rootDir, "public")))
 
 app.use(async (req, res, next) => {
   try {
-    req.user = await User.findById("5f7b63c3fb27cf33efa7994d")
+    const user = await User.findById("5f82ea70ff1f6d12a991f483")
+    req.user = new User(user.name, user.email, user.cart, user._id)
     next()
   } catch (error) {
     console.log(error)
   }
-  next()
 })
 
 app.use("/admin", adminRoutes)
