@@ -52,9 +52,17 @@ class Product {
     console.log(id)
     try {
       const db = await getDb()
-      return await db
+      await db
         .collection("products")
         .deleteOne({ _id: new mongodb.ObjectId(id) })
+      return await db.collection("users").updateOne(
+        { _id: new mongodb.ObjectId(userId) },
+        {
+          $pull: {
+            "cart.items": { productId: new ObjectId(prodId) },
+          },
+        }
+      )
     } catch (error) {
       console.log(error)
     }
