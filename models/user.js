@@ -52,17 +52,11 @@ userSchema.methods.addToCart = async function (product) {
 }
 
 userSchema.methods.deleteFromCart = async function (productId) {
-  try {
-    const newCart = {
-      items: this.cart.items.filter(
-        (p) => p.productId.toString() !== productId.toString()
-      ),
-    }
-    this.cart.items = newCart
-    return await this.save()
-  } catch (error) {
-    console.log(error)
-  }
+  const updatedCartItems = this.cart.items.filter((item) => {
+    return item.productId.toString() !== productId.toString()
+  })
+  this.cart.items = updatedCartItems
+  return this.save()
 }
 
 module.exports = mongoose.model("User", userSchema)
