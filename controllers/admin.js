@@ -1,7 +1,5 @@
 const Product = require("../models/product")
 
-const mongodb = require("mongodb")
-
 exports.renderAddProductPage = (req, res) => {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
@@ -12,7 +10,8 @@ exports.renderAddProductPage = (req, res) => {
 
 exports.postNewProduct = (req, res) => {
   const { title, price, imageUrl, description } = req.body
-  new Product(title, price, imageUrl, description, null, req.user._id)
+  const userId = req.user
+  new Product({ title, price, imageUrl, description, userId })
     .save()
     .then(() => res.redirect("/admin/products"))
     .catch((err) => console.error(err))
@@ -43,7 +42,12 @@ exports.getEditProduct = async (req, res) => {
 exports.postEditProduct = async (req, res) => {
   const { title, imageUrl, price, description, id } = req.body
   try {
-    await new Product(title, price, imageUrl, description, id).save()
+    const product = await Product.findById(id)
+    product.title = title
+    product.imageUrl = imageUrl
+    product.price = price
+    product.description = description
+    await product.save()
     await res.redirect("/admin/products")
   } catch (error) {
     console.log(error)
@@ -53,7 +57,7 @@ exports.postEditProduct = async (req, res) => {
 exports.postDeleteProduct = async (req, res) => {
   try {
     const { id } = req.body
-    await Product.deleteById(id)
+    await Product.findByIdAndRemove(id)
     await res.redirect("/admin/products")
   } catch (error) {
     console.log(error)
@@ -62,7 +66,7 @@ exports.postDeleteProduct = async (req, res) => {
 
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.fetchAll()
+    const products = await Product.find()
     await res.render("admin/products", {
       products,
       pageTitle: "Admin Products",

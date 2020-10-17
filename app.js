@@ -4,11 +4,11 @@ require("dotenv").config()
 
 const express = require("express")
 const bodyParser = require("body-parser")
+const mongoose = require("mongoose")
 
 const rootDir = require("./utils/path")
 
 const errorsController = require("./controllers/errors")
-const mongoConnect = require("./utils/database").mongoConnect
 const User = require("./models/user")
 
 const adminRoutes = require("./routes/admin")
@@ -24,8 +24,8 @@ app.use(express.static(path.join(rootDir, "public")))
 
 app.use(async (req, res, next) => {
   try {
-    const user = await User.findById("5f82ea70ff1f6d12a991f483")
-    req.user = new User(user.name, user.email, user.cart, user._id)
+    const user = await User.findById("5f8ab8912a154856c46d278f")
+    req.user = user
     next()
   } catch (error) {
     console.log(error)
@@ -37,6 +37,23 @@ app.use(shopRoutes)
 
 app.use(errorsController.renderPageNotFound)
 
-mongoConnect((client) => {
-  app.listen(3000)
-})
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.oygt6.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+  )
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const newUser = new User({
+          name: "Eugene",
+          email: "test@test.com",
+          cart: {
+            items: [],
+          },
+        })
+        newUser.save()
+      }
+    })
+    app.listen(3000)
+  })
+  .catch((err) => console.log(err))

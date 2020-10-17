@@ -2,7 +2,7 @@ const Product = require("../models/product")
 
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.fetchAll()
+    const products = await Product.find()
     await res.render("shop/product-list", {
       products,
       pageTitle: "All products",
@@ -29,7 +29,7 @@ exports.getProduct = async (req, res) => {
 
 exports.getIndex = async (req, res, next) => {
   try {
-    const products = await Product.fetchAll()
+    const products = await Product.find()
     await res.render("shop/index", {
       products,
       pageTitle: "Shop",
@@ -42,11 +42,11 @@ exports.getIndex = async (req, res, next) => {
 
 exports.getCart = async (req, res, next) => {
   try {
-    const cart = await req.user.getCart()
+    const user = await req.user.populate("cart.items.productId").execPopulate()
     res.render("shop/cart", {
       path: "/cart",
       pageTitle: "Your Cart",
-      products: cart,
+      products: user.cart.items,
     })
   } catch (error) {
     console.log(error)
@@ -75,42 +75,24 @@ exports.postCart = async (req, res) => {
   }
 }
 
-exports.postOrder = async (req, res) => {
-  try {
-    // const cart = await req.user.getCart()
-    // const products = await cart.getProducts()
-    await req.user.addOrder()
-    // await order.addProducts(
-    //   products.map((product) => {
-    //     product.orderItem = {
-    //       quantity: product.cartItem.quantity,
-    //     }
-    //     return product
-    //   })
-    // )
-    // await cart.setProducts(null)
-    await res.redirect("/orders")
-  } catch (err) {
-    console.log(err)
-  }
-}
+// exports.postOrder = async (req, res) => {
+//   try {
+//     await req.user.addOrder()
+//     await res.redirect("/orders")
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
 
-exports.getOrders = async (req, res, next) => {
-  try {
-    const orders = await req.user.getOrders()
-    await res.render("shop/orders", {
-      path: "/orders",
-      pageTitle: "Your Orders",
-      orders,
-    })
-  } catch (err) {
-    console.log(err)
-  }
-}
-
-// exports.getCheckout = (req, res, next) => {
-//   res.render("shop/Checkout", {
-//     path: "/checkout",
-//     pageTitle: "Checkout",
-//   })
+// exports.getOrders = async (req, res, next) => {
+//   try {
+//     const orders = await req.user.getOrders()
+//     await res.render("shop/orders", {
+//       path: "/orders",
+//       pageTitle: "Your Orders",
+//       orders,
+//     })
+//   } catch (err) {
+//     console.log(err)
+//   }
 // }
