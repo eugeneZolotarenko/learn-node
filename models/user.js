@@ -59,6 +59,11 @@ userSchema.methods.deleteFromCart = async function (productId) {
   return this.save()
 }
 
+userSchema.methods.clearCart = async function () {
+  this.cart = []
+  return this.save()
+}
+
 module.exports = mongoose.model("User", userSchema)
 
 // const getDb = require("../utils/database").getDb

@@ -83,7 +83,7 @@ exports.postOrder = async (req, res) => {
     const products = await user.cart.items.map((i) => {
       return {
         quantity: i.quantity,
-        product: i.productId,
+        product: { ...i.productId._doc },
       }
     })
     const order = new Order({
@@ -94,21 +94,22 @@ exports.postOrder = async (req, res) => {
       products,
     })
     await order.save()
+    await req.user.clearCart()
     await res.redirect("/orders")
   } catch (err) {
     console.log(err)
   }
 }
 
-// exports.getOrders = async (req, res, next) => {
-//   try {
-//     const orders = await req.user.getOrders()
-//     await res.render("shop/orders", {
-//       path: "/orders",
-//       pageTitle: "Your Orders",
-//       orders,
-//     })
-//   } catch (err) {
-//     console.log(err)
-//   }
-// }
+exports.getOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ "user.userId": req.user._id })
+    await res.render("shop/orders", {
+      path: "/orders",
+      pageTitle: "Your Orders",
+      orders,
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
