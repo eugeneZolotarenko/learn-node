@@ -8,6 +8,7 @@ exports.getProducts = async (req, res) => {
       products,
       pageTitle: "All products",
       path: "/products",
+      isAuthenticated: req.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -22,6 +23,7 @@ exports.getProduct = async (req, res) => {
       product,
       pageTitle: product.title,
       path: "/products",
+      isAuthenticated: req.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -35,6 +37,7 @@ exports.getIndex = async (req, res, next) => {
       products,
       pageTitle: "Shop",
       path: "/",
+      isAuthenticated: req.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -48,6 +51,7 @@ exports.getCart = async (req, res, next) => {
       path: "/cart",
       pageTitle: "Your Cart",
       products: user.cart.items,
+      isAuthenticated: req.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -57,7 +61,6 @@ exports.getCart = async (req, res, next) => {
 exports.deleteCartItem = async (req, res) => {
   try {
     const { productId } = req.body
-    // console.log(productId)
     await req.user.deleteFromCart(productId)
     await res.redirect("/cart")
   } catch (err) {
@@ -108,6 +111,7 @@ exports.getOrders = async (req, res, next) => {
       path: "/orders",
       pageTitle: "Your Orders",
       orders,
+      isAuthenticated: req.isLoggedIn,
     })
   } catch (err) {
     console.log(err)
