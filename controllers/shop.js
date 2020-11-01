@@ -8,7 +8,7 @@ exports.getProducts = async (req, res) => {
       products,
       pageTitle: "All products",
       path: "/products",
-      isAuthenticated: req.isLoggedIn,
+      isAuthenticated: req.session.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -23,7 +23,7 @@ exports.getProduct = async (req, res) => {
       product,
       pageTitle: product.title,
       path: "/products",
-      isAuthenticated: req.isLoggedIn,
+      isAuthenticated: req.session.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -37,7 +37,7 @@ exports.getIndex = async (req, res, next) => {
       products,
       pageTitle: "Shop",
       path: "/",
-      isAuthenticated: req.isLoggedIn,
+      isAuthenticated: req.session.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -51,7 +51,7 @@ exports.getCart = async (req, res, next) => {
       path: "/cart",
       pageTitle: "Your Cart",
       products: user.cart.items,
-      isAuthenticated: req.isLoggedIn,
+      isAuthenticated: req.session.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
@@ -111,7 +111,7 @@ exports.getOrders = async (req, res, next) => {
       path: "/orders",
       pageTitle: "Your Orders",
       orders,
-      isAuthenticated: req.isLoggedIn,
+      isAuthenticated: req.session.isLoggedIn,
     })
   } catch (err) {
     console.log(err)
