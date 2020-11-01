@@ -34,15 +34,17 @@ app.use(
   session({
     secret: "my secret",
     resave: false,
-    saveUninintialized: false,
+    saveUninitialized: false,
     store,
   })
 )
 
 app.use(async (req, res, next) => {
   try {
-    const user = await User.findById("5f8ab8912a154856c46d278f")
-    req.user = user
+    if (await User.findById(req.session.user)) {
+      const user = await User.findById(req.session.user._id)
+      req.user = user
+    }
     next()
   } catch (error) {
     console.log(error)
