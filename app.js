@@ -7,6 +7,7 @@ const bodyParser = require("body-parser")
 const mongoose = require("mongoose")
 const session = require("express-session")
 const MongoDBStore = require("connect-mongodb-session")(session)
+const csrf = require("csurf")
 
 const rootDir = require("./utils/path")
 
@@ -24,6 +25,7 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "sessions",
 })
+const csrfProtection = csrf()
 
 app.set("view engine", "ejs")
 app.set("views", "views")
@@ -38,6 +40,7 @@ app.use(
     store,
   })
 )
+app.use(csrfProtection)
 
 app.use(async (req, res, next) => {
   try {
@@ -51,6 +54,12 @@ app.use(async (req, res, next) => {
   }
 })
 
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn
+  res.locals.csrfToken = req.csrfToken()
+  next()
+})
+
 app.use("/admin", adminRoutes)
 app.use(shopRoutes)
 app.use(authRoutes)
@@ -60,18 +69,6 @@ app.use(errorsController.renderPageNotFound)
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const newUser = new User({
-          name: "Eugene",
-          email: "test@test.com",
-          cart: {
-            items: [],
-          },
-        })
-        newUser.save()
-      }
-    })
     app.listen(3000)
   })
   .catch((err) => console.log(err))

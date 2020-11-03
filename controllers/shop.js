@@ -37,7 +37,6 @@ exports.getIndex = async (req, res, next) => {
       products,
       pageTitle: "Shop",
       path: "/",
-      isAuthenticated: req.session.isLoggedIn,
     })
   } catch (error) {
     console.log(error)
