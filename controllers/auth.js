@@ -5,6 +5,8 @@ const bcrypt = require("bcryptjs")
 const nodemailer = require("nodemailer")
 const sendgridTransport = require("nodemailer-sendgrid-transport")
 
+const { validationResult } = require("express-validator/check")
+
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
@@ -78,6 +80,16 @@ exports.getSignup = async (req, res, next) => {
 exports.postSignup = async (req, res, next) => {
   try {
     const { email, password, confirmPassword } = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      console.log(errors.array())
+      return res.status(422).render("auth/signup", {
+        path: "/signup",
+        pageTitle: "Signup",
+        isAuthenticated: false,
+        errorMessage: errors.array()[0].msg,
+      })
+    }
     const userDoc = await User.findOne({ email })
     if (userDoc) {
       req.flash("error", "Email already exists")
