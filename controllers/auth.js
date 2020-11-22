@@ -195,20 +195,18 @@ exports.getNewPassword = async (req, res, next) => {
 
 exports.postNewPassword = async (req, res, next) => {
   try {
-    const { newPassword, userId, passwordToken } = await req.body
+    const { password, userId, passwordToken } = await req.body
 
     const user = await User.findOne({
       resetToken: passwordToken,
       resetTokenExpiration: { $gt: Date.now() },
       _id: userId,
     })
-    const hashedPassword = async () => await bcrypt.hash(newPassword, 12)
+    const hashedPassword = async () => await bcrypt.hash(password, 12)
 
-    hashedPassword().then(() => {
-      user.password = hashedPassword()
-      user.resetToken = ""
-      user.resetTokenExpiration = null
-    })
+    user.password = await hashedPassword()
+    user.resetToken = ""
+    user.resetTokenExpiration = null
 
     await user.save()
 
